@@ -31,16 +31,26 @@ export default function Home() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // CALENDAR SETUP
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentYear = today.getFullYear();
+  // NEW: Track the month currently being viewed
+  const [viewDate, setViewDate] = useState(new Date());
+
+  // CALENDAR SETUP (Now uses viewDate instead of a static 'today')
+  const currentMonth = viewDate.getMonth();
+  const currentYear = viewDate.getFullYear();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-  // Helper function to handle the click and help debug
   function handleDayClick(dateStr) {
-    console.log("You clicked:", dateStr); // This will show in your browser console
+    console.log("You clicked:", dateStr);
     setSelectedDate(dateStr);
+  }
+
+  // NEW: Functions to change the month
+  function prevMonth() {
+    setViewDate(new Date(currentYear, currentMonth - 1, 1));
+  }
+
+  function nextMonth() {
+    setViewDate(new Date(currentYear, currentMonth + 1, 1));
   }
 
   return (
@@ -61,9 +71,19 @@ export default function Home() {
         {/* CALENDAR VIEW */}
         {showCalendar ? (
           <div className="bg-white rounded-xl p-5 shadow">
-             <h2 className="text-xl font-bold text-gray-800 mb-4">
-               {today.toLocaleString('default', { month: 'long', year: 'numeric' })}
-             </h2>
+             
+             {/* NEW: Month Navigation Header */}
+             <div className="flex justify-between items-center mb-4">
+               <button onClick={prevMonth} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 font-bold">
+                 &lt; Prev
+               </button>
+               <h2 className="text-xl font-bold text-gray-800">
+                 {viewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+               </h2>
+               <button onClick={nextMonth} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 font-bold">
+                 Next &gt;
+               </button>
+             </div>
              
              <div className="grid grid-cols-7 gap-2 text-center">
                {/* Day labels */}
@@ -71,7 +91,7 @@ export default function Home() {
                  <div key={day} className="text-xs font-bold text-gray-400">{day}</div>
                ))}
                
-               {/* 31 Simple day blocks */}
+               {/* Simple day blocks */}
                {Array.from({ length: daysInMonth }).map((_, i) => {
                  const dayNum = i + 1;
                  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
@@ -126,59 +146,4 @@ export default function Home() {
           /* --- ORIGINAL UI (LIST VIEW) --- */
           <>
             <div className="bg-white rounded-xl p-5 shadow mb-6">
-              <h2 className="text-lg font-semibold text-gray-700 mb-4">Add New Assignment</h2>
-
-              <input
-                type="text"
-                placeholder="Assignment title"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm text-black focus:outline-none focus:border-blue-400"
-              />
-              <input
-                type="text"
-                placeholder="Class (e.g. CSC 2053)"
-                value={cls}
-                onChange={e => setCls(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3 text-sm text-black focus:outline-none focus:border-blue-400"
-              />
-              <input
-                type="date"
-                value={due}
-                onChange={e => setDue(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 text-sm text-black focus:outline-none focus:border-blue-400"
-              />
-
-              <button
-                onClick={addAssignment}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-lg transition-colors"
-              >
-                Add Assignment
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {assignments.length === 0 && (
-                <p className="text-center text-gray-400 text-sm py-8">No assignments yet. Add one above!</p>
-              )}
-
-              {assignments.map(a => (
-                <div
-                  key={a.id}
-                  className={`bg-white rounded-xl p-4 shadow flex items-center gap-3 ${a.done ? 'opacity-50' : ''}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={a.done}
-                    onChange={() => toggleDone(a.id)}
-                    className="w-4 h-4 cursor-pointer"
-                  />
-
-                  <div className="flex-1">
-                    <p className={`font-medium text-gray-800 ${a.done ? 'line-through' : ''}`}>{a.title}</p>
-                    <p className="text-xs text-gray-400">{a.cls} · Due {a.due}</p>
-                  </div>
-
-                  <button
-                    onClick={() => deleteAssignment(a.id)}
-                    className="text-gray-300 hover:text-red-400 text-
+              <h2 className="text-lg font-semibold text-gray-700 mb-4
