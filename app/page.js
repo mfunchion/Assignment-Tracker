@@ -29,8 +29,6 @@ export default function Home() {
   }
 
   const [showCalendar, setShowCalendar] = useState(false);
-  
-  // NEW: State to track which day the user clicked on
   const [selectedDate, setSelectedDate] = useState(null);
 
   // CALENDAR SETUP
@@ -39,11 +37,17 @@ export default function Home() {
   const currentYear = today.getFullYear();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
+  // Helper function to handle the click and help debug
+  function handleDayClick(dateStr) {
+    console.log("You clicked:", dateStr); // This will show in your browser console
+    setSelectedDate(dateStr);
+  }
+
   return (
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-xl mx-auto">
 
-        {/* HEADER & NEW TOGGLE BUTTON */}
+        {/* HEADER & TOGGLE BUTTON */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Assignment Tracker</h1>
           <button 
@@ -70,44 +74,48 @@ export default function Home() {
                {/* 31 Simple day blocks */}
                {Array.from({ length: daysInMonth }).map((_, i) => {
                  const dayNum = i + 1;
-                 // Format the day to match your YYYY-MM-DD string
                  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
                  
-                 // Check if this specific day has an assignment
                  const hasAssignment = assignments.some(a => a.due === dateStr);
-                 // Check if this is the day the user currently clicked
                  const isSelected = selectedDate === dateStr;
 
                  return (
-                   <div 
+                   <button 
                      key={i} 
-                     // NEW: When clicked, set this day as the selected date
-                     onClick={() => setSelectedDate(dateStr)}
-                     className={`p-3 rounded-lg border cursor-pointer transition-colors
+                     type="button"
+                     onClick={() => handleDayClick(dateStr)}
+                     className={`p-3 rounded-lg border w-full transition-colors cursor-pointer
                        ${hasAssignment ? 'bg-blue-100 border-blue-400 font-bold text-blue-800' : 'border-gray-100 hover:bg-gray-50'}
-                       ${isSelected ? 'ring-2 ring-blue-600' : ''}
+                       ${isSelected ? 'ring-2 ring-blue-600 outline-none' : ''}
                      `}
                    >
                      {dayNum}
-                   </div>
+                   </button>
                  );
                })}
              </div>
 
-             {/* NEW: Show assignments for the selected day */}
+             {/* DISPLAY ASSIGNMENTS FOR SELECTED DAY */}
              {selectedDate && (
-               <div className="mt-6 pt-4 border-t border-gray-200">
-                 <h3 className="font-semibold text-gray-700 mb-3">Assignments for {selectedDate}:</h3>
+               <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                 <h3 className="font-semibold text-gray-800 mb-3 text-lg border-b pb-2">
+                   Due on {selectedDate}:
+                 </h3>
+                 
                  <div className="flex flex-col gap-2">
                    {assignments.filter(a => a.due === selectedDate).length > 0 ? (
                      assignments.filter(a => a.due === selectedDate).map(a => (
-                       <div key={a.id} className="flex justify-between text-sm bg-gray-50 p-3 rounded border border-gray-200">
-                         <span className={`font-medium ${a.done ? 'line-through text-gray-400' : 'text-gray-800'}`}>{a.title} ({a.cls})</span>
-                         <span className={a.done ? 'text-gray-400' : 'text-blue-600'}>{a.done ? 'Done' : 'Pending'}</span>
+                       <div key={a.id} className="flex justify-between items-center text-sm bg-white p-3 rounded border border-gray-200 shadow-sm">
+                         <span className={`font-medium ${a.done ? 'line-through text-gray-400' : 'text-gray-800'}`}>
+                           {a.title} ({a.cls})
+                         </span>
+                         <span className={`px-2 py-1 rounded text-xs font-bold ${a.done ? 'bg-gray-200 text-gray-500' : 'bg-blue-100 text-blue-700'}`}>
+                           {a.done ? 'Done' : 'Pending'}
+                         </span>
                        </div>
                      ))
                    ) : (
-                     <p className="text-sm text-gray-500">No assignments due on this date.</p>
+                     <p className="text-sm text-gray-500 italic">No assignments due on this date.</p>
                    )}
                  </div>
                </div>
@@ -115,7 +123,7 @@ export default function Home() {
           </div>
         ) : (
 
-          /* --- YOUR EXACT ORIGINAL UI (LIST VIEW) --- */
+          /* --- ORIGINAL UI (LIST VIEW) --- */
           <>
             <div className="bg-white rounded-xl p-5 shadow mb-6">
               <h2 className="text-lg font-semibold text-gray-700 mb-4">Add New Assignment</h2>
@@ -173,17 +181,4 @@ export default function Home() {
 
                   <button
                     onClick={() => deleteAssignment(a.id)}
-                    className="text-gray-300 hover:text-red-400 text-lg transition-colors"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-      </div>
-    </main>
-  );
-}
+                    className="text-gray-300 hover:text-red-400 text-
