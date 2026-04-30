@@ -31,10 +31,8 @@ export default function Home() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // NEW: Track the month currently being viewed
   const [viewDate, setViewDate] = useState(new Date());
 
-  // CALENDAR SETUP (Now uses viewDate instead of a static 'today')
   const currentMonth = viewDate.getMonth();
   const currentYear = viewDate.getFullYear();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -44,7 +42,6 @@ export default function Home() {
     setSelectedDate(dateStr);
   }
 
-  // NEW: Functions to change the month
   function prevMonth() {
     setViewDate(new Date(currentYear, currentMonth - 1, 1));
   }
@@ -57,7 +54,6 @@ export default function Home() {
     <main className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-xl mx-auto">
 
-        {/* HEADER & TOGGLE BUTTON */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Assignment Tracker</h1>
           <button 
@@ -68,11 +64,9 @@ export default function Home() {
           </button>
         </div>
 
-        {/* CALENDAR VIEW */}
         {showCalendar ? (
           <div className="bg-white rounded-xl p-5 shadow">
              
-             {/* NEW: Month Navigation Header */}
              <div className="flex justify-between items-center mb-4">
                <button onClick={prevMonth} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700 font-bold">
                  &lt; Prev
@@ -86,12 +80,10 @@ export default function Home() {
              </div>
              
              <div className="grid grid-cols-7 gap-2 text-center">
-               {/* Day labels */}
                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
                  <div key={day} className="text-xs font-bold text-gray-400">{day}</div>
                ))}
                
-               {/* Simple day blocks */}
                {Array.from({ length: daysInMonth }).map((_, i) => {
                  const dayNum = i + 1;
                  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
@@ -115,7 +107,6 @@ export default function Home() {
                })}
              </div>
 
-             {/* DISPLAY ASSIGNMENTS FOR SELECTED DAY */}
              {selectedDate && (
                <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                  <h3 className="font-semibold text-gray-800 mb-3 text-lg border-b pb-2">
@@ -143,7 +134,6 @@ export default function Home() {
           </div>
         ) : (
 
-          /* --- ORIGINAL UI (LIST VIEW) --- */
           <>
             <div className="bg-white rounded-xl p-5 shadow mb-6">
               <h2 className="text-lg font-semibold text-gray-700 mb-4">Add New Assignment</h2>
