@@ -29,6 +29,9 @@ export default function Home() {
   }
 
   const [showCalendar, setShowCalendar] = useState(false);
+  
+  // NEW: State to track which day the user clicked on
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // CALENDAR SETUP
   const today = new Date();
@@ -72,20 +75,47 @@ export default function Home() {
                  
                  // Check if this specific day has an assignment
                  const hasAssignment = assignments.some(a => a.due === dateStr);
+                 // Check if this is the day the user currently clicked
+                 const isSelected = selectedDate === dateStr;
 
                  return (
                    <div 
                      key={i} 
-                     className={`p-3 rounded-lg border ${hasAssignment ? 'bg-blue-100 border-blue-400 font-bold text-blue-800' : 'border-gray-100'}`}
+                     // NEW: When clicked, set this day as the selected date
+                     onClick={() => setSelectedDate(dateStr)}
+                     className={`p-3 rounded-lg border cursor-pointer transition-colors
+                       ${hasAssignment ? 'bg-blue-100 border-blue-400 font-bold text-blue-800' : 'border-gray-100 hover:bg-gray-50'}
+                       ${isSelected ? 'ring-2 ring-blue-600' : ''}
+                     `}
                    >
                      {dayNum}
                    </div>
                  );
                })}
              </div>
+
+             {/* NEW: Show assignments for the selected day */}
+             {selectedDate && (
+               <div className="mt-6 pt-4 border-t border-gray-200">
+                 <h3 className="font-semibold text-gray-700 mb-3">Assignments for {selectedDate}:</h3>
+                 <div className="flex flex-col gap-2">
+                   {assignments.filter(a => a.due === selectedDate).length > 0 ? (
+                     assignments.filter(a => a.due === selectedDate).map(a => (
+                       <div key={a.id} className="flex justify-between text-sm bg-gray-50 p-3 rounded border border-gray-200">
+                         <span className={`font-medium ${a.done ? 'line-through text-gray-400' : 'text-gray-800'}`}>{a.title} ({a.cls})</span>
+                         <span className={a.done ? 'text-gray-400' : 'text-blue-600'}>{a.done ? 'Done' : 'Pending'}</span>
+                       </div>
+                     ))
+                   ) : (
+                     <p className="text-sm text-gray-500">No assignments due on this date.</p>
+                   )}
+                 </div>
+               </div>
+             )}
           </div>
         ) : (
 
+          /* --- YOUR EXACT ORIGINAL UI (LIST VIEW) --- */
           <>
             <div className="bg-white rounded-xl p-5 shadow mb-6">
               <h2 className="text-lg font-semibold text-gray-700 mb-4">Add New Assignment</h2>
